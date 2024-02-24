@@ -4,7 +4,11 @@ using CampaignIntergrator.App.Server.Middleware;
 using CampaignIntergrator.App.Server.Requests;
 using CampaignIntergrator.App.Server.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options
+    => options.AddDefaultPolicy(builder
+    => builder.SetIsOriginAllowed(origin => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials()));
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -14,16 +18,16 @@ builder.Services.AddMediatR(x => x.RegisterServicesFromAssemblyContaining<Progra
 builder.Services.AddScoped<ValidationMappingMiddleware>();
 builder.Services.AddScoped<GuidService>();
 
-
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-} 
+}
 
+app.UseCors();
 app.UseHttpsRedirection();
 
 app.UseMiddleware<ValidationMappingMiddleware>();
